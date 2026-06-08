@@ -35,16 +35,16 @@
     user-select: none;
   }
 
-  /* ─── TOP BAR ─── */
   #topbar {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 10px 18px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     flex-shrink: 0;
     z-index: 100;
+    flex-wrap: wrap;
   }
 
   #topbar h1 {
@@ -53,6 +53,7 @@
     color: var(--accent);
     letter-spacing: 0.5px;
     flex: 1;
+    min-width: 160px;
   }
 
   .btn {
@@ -60,7 +61,7 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 8px 16px;
+    padding: 8px 14px;
     font-family: 'Vazirmatn', sans-serif;
     font-size: 13px;
     font-weight: 600;
@@ -76,17 +77,40 @@
   .btn.success { background: #1a7a4a; border: 1px solid var(--success); color: var(--success); }
   .btn.success:hover { background: var(--success); color: #0a1a12; }
   .btn.danger { background: var(--danger); }
+  .btn.img-mode { background: #2a1a4a; border: 1px solid #7b4ff7; color: #c4a0ff; }
+  .btn.img-mode.active { background: #7b4ff7; color: #fff; }
 
-  #file-input { display: none; }
+  #file-input, #img-input { display: none; }
 
-  /* ─── MAIN LAYOUT ─── */
+  /* mode tab strip */
+  .upload-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .upload-tab {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Vazirmatn', sans-serif;
+    transition: all 0.18s;
+  }
+  .upload-tab.active { background: var(--accent); color: #fff; }
+  .upload-tab.img-tab.active { background: #7b4ff7; }
+
   #main {
     display: flex;
     flex: 1;
     overflow: hidden;
   }
 
-  /* ─── PDF VIEWER ─── */
   #viewer-wrap {
     flex: 1;
     overflow-y: auto;
@@ -112,6 +136,7 @@
   #drop-zone .icon { font-size: 64px; opacity: 0.4; }
   #drop-zone p { font-size: 16px; }
   #drop-zone .hint { font-size: 13px; opacity: 0.6; }
+  #drop-zone .upload-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
   .page-container {
     position: relative;
@@ -121,12 +146,24 @@
     margin-top: 28px;
   }
 
-  .page-container canvas {
+  .page-container canvas { display: block; border-radius: 4px; }
+
+  /* image container */
+  .img-container {
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    border-radius: 4px;
+    overflow: visible;
+    margin-top: 28px;
+  }
+  .img-container img {
     display: block;
     border-radius: 4px;
+    max-width: 100%;
+    user-select: none;
+    pointer-events: none;
   }
 
-  /* ─── TOTAL SCORE BADGE — now editable text ─── */
   .total-badge {
     position: absolute;
     top: -28px;
@@ -159,25 +196,15 @@
     user-select: text;
     transition: background 0.15s, border 0.15s;
   }
-  .total-badge .edit-total:focus {
-    outline: none;
-    background: rgba(0,0,0,0.22);
-    border-color: rgba(0,0,0,0.35);
-  }
+  .total-badge .edit-total:focus { outline: none; background: rgba(0,0,0,0.22); border-color: rgba(0,0,0,0.35); }
   .total-badge .edit-total::placeholder { opacity: 0.45; }
   .total-badge .auto-hint {
-    font-size: 10px;
-    opacity: 0.55;
-    white-space: nowrap;
-    cursor: pointer;
-    text-decoration: underline dotted;
+    font-size: 10px; opacity: 0.55; white-space: nowrap; cursor: pointer; text-decoration: underline dotted;
   }
   .total-badge .auto-hint:hover { opacity: 0.9; }
 
-  /* ─── SCORE STAMPS on PDF ─── */
   .score-stamp {
     position: absolute;
-    background: var(--accent);
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -192,25 +219,46 @@
     gap: 6px;
     animation: popIn 0.15s ease;
     white-space: nowrap;
+    transform: translate(-50%, -50%);
+    background: var(--accent);
   }
+  .score-stamp.stamp-tick {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 4px;
+    color: #4ff7a0;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7), 0 0 12px rgba(79,247,160,0.6);
+    font-size: 28px !important;
+  }
+  .score-stamp.stamp-cross {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 4px;
+    color: #f74f4f;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7), 0 0 12px rgba(247,79,79,0.6);
+    font-size: 28px !important;
+  }
+  .score-stamp.stamp-tick .remove-stamp,
+  .score-stamp.stamp-cross .remove-stamp {
+    background: rgba(0,0,0,0.35);
+    font-size: 10px;
+  }
+
   @keyframes popIn {
     from { transform: translate(-50%,-50%) scale(0.6); opacity: 0; }
     to   { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
   }
-  .score-stamp { transform: translate(-50%, -50%); }
   .score-stamp .remove-stamp {
-    cursor: pointer;
-    font-size: 11px;
-    opacity: 0.7;
-    width: 16px; height: 16px;
-    border-radius: 50%;
+    cursor: pointer; font-size: 11px; opacity: 0.7;
+    width: 16px; height: 16px; border-radius: 50%;
     background: rgba(255,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
     transition: opacity 0.15s;
   }
   .score-stamp .remove-stamp:hover { opacity: 1; background: rgba(255,0,0,0.5); }
 
-  /* ─── SIDE PANEL ─── */
   #sidebar {
     width: 240px;
     background: var(--surface);
@@ -221,83 +269,56 @@
     flex-shrink: 0;
   }
 
-  .sidebar-section {
-    padding: 14px;
-    border-bottom: 1px solid var(--border);
-  }
+  .sidebar-section { padding: 14px; border-bottom: 1px solid var(--border); }
   .sidebar-section h3 {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 10px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted); margin-bottom: 10px;
   }
 
   #page-list { display: flex; flex-direction: column; gap: 8px; }
   .page-thumb {
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    transition: background 0.15s;
-    border: 1px solid transparent;
+    padding: 8px 10px; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    transition: background 0.15s; border: 1px solid transparent;
   }
   .page-thumb:hover { background: var(--surface2); }
   .page-thumb.active { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
   .page-thumb .num {
-    width: 24px; height: 24px; border-radius: 6px;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    width: 24px; height: 24px; border-radius: 6px; background: var(--surface2);
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;
   }
   .page-thumb.active .num { background: var(--accent); color: #fff; }
 
   .mode-btns { display: flex; gap: 6px; }
   .mode-btn {
-    flex: 1; padding: 8px 4px; border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text);
-    font-family: 'Vazirmatn', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
+    flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px; cursor: pointer; text-align: center; transition: all 0.15s;
   }
   .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 
-  .label-row {
-    display: flex; gap: 6px; align-items: center; margin-bottom: 8px;
-  }
+  .label-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
   .label-row label { font-size: 12px; color: var(--muted); flex-shrink: 0; }
   .label-input {
     flex: 1; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 6px; padding: 6px 8px;
-    font-family: 'Vazirmatn', sans-serif; font-size: 12px; color: var(--text);
-    user-select: text;
+    font-family: 'Vazirmatn', sans-serif; font-size: 12px; color: var(--text); user-select: text;
   }
   .label-input:focus { outline: none; border-color: var(--accent); }
 
   #stamp-log { display: flex; flex-direction: column; gap: 4px; }
   .stamp-entry {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 8px; border-radius: 6px;
-    background: var(--surface2);
-    font-size: 12px;
-    transition: background 0.15s;
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 6px; background: var(--surface2); font-size: 12px; transition: background 0.15s;
   }
   .stamp-entry:hover { background: var(--border); }
   .stamp-entry .score-dot {
-    width: 28px; height: 22px; border-radius: 4px;
-    background: var(--accent);
+    width: 28px; height: 22px; border-radius: 4px; background: var(--accent);
     color: #fff; font-size: 11px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .stamp-entry .score-dot.tick { background: #1a7a4a; color: var(--success); }
+  .stamp-entry .score-dot.cross { background: #7a1a1a; color: var(--danger); }
   .stamp-entry .label { flex: 1; }
   .stamp-entry .del { color: var(--danger); font-size: 14px; opacity: 0.6; cursor: pointer; }
   .stamp-entry .del:hover { opacity: 1; }
@@ -311,75 +332,51 @@
     z-index: 50;
   }
 
-  #palette-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
-  }
+  #palette-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
   #palette-header span { font-size: 12px; color: var(--muted); }
-  #selected-score-display {
-    font-size: 13px; font-weight: 700; color: var(--accent2);
-  }
+  #selected-score-display { font-size: 13px; font-weight: 700; color: var(--accent2); }
 
-  #score-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
+  #palette-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  #score-buttons { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
 
   .score-btn {
-    width: var(--score-btn-size);
-    height: var(--score-btn-size);
-    border-radius: 10px;
-    border: 2px solid var(--border);
-    background: var(--surface2);
-    color: var(--text);
-    font-family: 'Vazirmatn', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
+    width: var(--score-btn-size); height: var(--score-btn-size);
+    border-radius: 10px; border: 2px solid var(--border); background: var(--surface2);
+    color: var(--text); font-family: 'Vazirmatn', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
   }
-  .score-btn::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
+  .score-btn::before { content: ''; position: absolute; inset: 0; background: var(--accent); opacity: 0; transition: opacity 0.15s; }
   .score-btn:hover::before { opacity: 0.15; }
   .score-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .score-btn.selected {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(79,142,247,0.45);
-    transform: translateY(-3px) scale(1.08);
-  }
+  .score-btn.selected { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 16px rgba(79,142,247,0.45); transform: translateY(-3px) scale(1.08); }
   .score-btn.zero { border-color: var(--danger); }
   .score-btn.zero.selected { background: var(--danger); border-color: var(--danger); box-shadow: 0 4px 16px rgba(247,79,79,0.45); }
   .score-btn.full { border-color: var(--success); }
   .score-btn.full.selected { background: var(--success); border-color: var(--success); color: #0a1a12; box-shadow: 0 4px 16px rgba(79,247,160,0.45); }
 
+  /* Tick / Cross symbol buttons */
+  .symbol-btns { display: flex; gap: 8px; align-items: center; }
+  .symbol-sep { width: 1px; height: 44px; background: var(--border); }
+
+  .sym-btn {
+    width: 52px; height: 52px; border-radius: 12px;
+    border: 2px solid var(--border); background: var(--surface2);
+    font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .sym-btn:hover { transform: translateY(-2px); }
+  .sym-btn.tick-btn { border-color: #2a5a40; color: var(--success); }
+  .sym-btn.tick-btn:hover, .sym-btn.tick-btn.selected { background: #1a7a4a; border-color: var(--success); box-shadow: 0 4px 16px rgba(79,247,160,0.4); transform: translateY(-3px) scale(1.08); }
+  .sym-btn.cross-btn { border-color: #5a2a2a; color: var(--danger); }
+  .sym-btn.cross-btn:hover, .sym-btn.cross-btn.selected { background: #7a1a1a; border-color: var(--danger); box-shadow: 0 4px 16px rgba(247,79,79,0.4); transform: translateY(-3px) scale(1.08); }
+
   #cursor-badge {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(79,142,247,0.9);
-    color: #fff;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: 200;
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+    background: rgba(79,142,247,0.9); color: #fff; padding: 6px 16px;
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 200;
   }
   #cursor-badge.visible { opacity: 1; }
 
@@ -389,39 +386,82 @@
 
   #zoom-controls { display: flex; gap: 6px; align-items: center; }
   #zoom-label { font-size: 12px; color: var(--muted); min-width: 38px; text-align: center; }
-
   .btn.sm { padding: 6px 10px; font-size: 13px; }
 
   #summary-line {
     font-size: 12px; color: var(--muted); padding: 8px 14px;
-    border-top: 1px solid var(--border);
-    display: flex; justify-content: space-between;
+    border-top: 1px solid var(--border); display: flex; justify-content: space-between;
   }
   #summary-line span { color: var(--accent2); font-weight: 600; }
 
-  /* ─── PDF EXPORT PROGRESS ─── */
   #export-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(10,12,20,0.85);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
+    display: none; position: fixed; inset: 0; background: rgba(10,12,20,0.85);
+    z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
   }
   #export-overlay.visible { display: flex; }
   #export-overlay .msg { font-size: 16px; font-weight: 600; color: var(--text); }
   #export-overlay .sub { font-size: 13px; color: var(--muted); }
-  .progress-bar-wrap {
-    width: 280px; height: 6px; background: var(--surface2);
-    border-radius: 3px; overflow: hidden;
+  .progress-bar-wrap { width: 280px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.3s; }
+
+  /* image mode indicator */
+  .img-mode-tag {
+    background: #2a1a4a; border: 1px solid #7b4ff7; color: #c4a0ff;
+    border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 600;
   }
-  .progress-bar-fill {
-    height: 100%; background: var(--accent);
-    border-radius: 3px; width: 0%;
-    transition: width 0.3s;
+
+  /* ─── FINAL SCORE PANEL ─── */
+  #final-score-bar {
+    background: linear-gradient(90deg, #1a2540 0%, #1a1d27 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    z-index: 90;
   }
+  #final-score-bar label {
+    font-size: 12px; color: var(--muted); white-space: nowrap;
+  }
+  #final-score-input {
+    background: var(--surface2);
+    border: 2px solid #3a5a8a;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f7c14f;
+    width: 100px;
+    text-align: center;
+    user-select: text;
+    transition: border 0.15s, box-shadow 0.15s;
+  }
+  #final-score-input:focus {
+    outline: none;
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(247,193,79,0.15);
+  }
+  #final-score-input::placeholder { color: var(--muted); font-size: 13px; font-weight: 400; }
+  .final-score-hint { font-size: 11px; color: var(--muted); }
+  .final-score-out-of {
+    font-size: 13px; color: var(--muted);
+  }
+  #final-score-bar .divider { flex: 1; }
+
+  /* ─── FOOTER ─── */
+  #app-footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 7px 20px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--muted);
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+  #app-footer span { color: #7b9fd4; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -429,15 +469,35 @@
 <!-- TOP BAR -->
 <div id="topbar">
   <h1>📋 سامانه تصحیح ورقه‌های امتحانی</h1>
+
+  <div class="upload-tabs">
+    <button class="upload-tab active" id="tab-pdf">📄 PDF</button>
+    <button class="upload-tab img-tab" id="tab-img">🖼 عکس</button>
+  </div>
+
   <div id="zoom-controls">
     <button class="btn sm secondary" id="zoom-out">−</button>
     <span id="zoom-label">100%</span>
     <button class="btn sm secondary" id="zoom-in">+</button>
   </div>
-  <button class="btn secondary" id="open-btn">📂 بارگذاری PDF</button>
+
+  <button class="btn secondary" id="open-btn">📂 بارگذاری</button>
   <button class="btn secondary" id="export-json-btn">💾 JSON</button>
-  <button class="btn success" id="export-pdf-btn">⬇ دانلود PDF نهایی</button>
+  <button class="btn success" id="export-pdf-btn">⬇ دانلود نهایی</button>
+
   <input type="file" id="file-input" accept=".pdf">
+  <input type="file" id="img-input" accept="image/*">
+</div>
+
+<!-- FINAL SCORE BAR -->
+<div id="final-score-bar">
+  <label>🏆 نمره نهایی دانش‌آموز:</label>
+  <input type="text" id="final-score-input" inputmode="decimal" placeholder="مثلاً: ۱۷.۵" autocomplete="off">
+  <span class="final-score-out-of">از</span>
+  <input type="text" id="final-score-max" inputmode="decimal" placeholder="۲۰" autocomplete="off"
+    style="background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:5px 10px;font-family:'Vazirmatn',sans-serif;font-size:14px;font-weight:600;color:var(--text);width:64px;text-align:center;user-select:text;">
+  <span class="final-score-hint">← این نمره روی خروجی نهایی چاپ می‌شود</span>
+  <div class="divider"></div>
 </div>
 
 <!-- MAIN -->
@@ -481,10 +541,13 @@
   <!-- VIEWER -->
   <div id="viewer-wrap">
     <div id="drop-zone">
-      <div class="icon">📄</div>
-      <p>فایل PDF را بارگذاری کنید</p>
+      <div class="icon" id="drop-icon">📄</div>
+      <p id="drop-title">فایل PDF یا تصویر را بارگذاری کنید</p>
       <p class="hint">یا فایل را اینجا رها کنید</p>
-      <button class="btn" id="open-btn2">📂 انتخاب فایل</button>
+      <div class="upload-row">
+        <button class="btn" id="open-btn2">📄 انتخاب PDF</button>
+        <button class="btn img-mode" id="open-img-btn2">🖼 انتخاب عکس</button>
+      </div>
     </div>
   </div>
 
@@ -495,31 +558,56 @@
   <div id="palette-header">
     <span>نمره انتخابی:</span>
     <div id="selected-score-display">—</div>
-    <span style="font-size:11px;color:var(--muted)">روی صفحه کلیک کنید تا نمره درج شود</span>
+    <span style="font-size:11px;color:var(--muted)">روی صفحه کلیک کنید تا درج شود</span>
   </div>
-  <div id="score-buttons"></div>
+  <div id="palette-row">
+    <div id="score-buttons"></div>
+    <div class="symbol-sep"></div>
+    <div class="symbol-btns">
+      <button class="sym-btn tick-btn" id="sym-tick" title="درج تیک ✓">✓</button>
+      <button class="sym-btn cross-btn" id="sym-cross" title="درج ضربدر ✗">✗</button>
+    </div>
+  </div>
 </div>
 
 <div id="cursor-badge"></div>
 
 <!-- PDF EXPORT OVERLAY -->
 <div id="export-overlay">
-  <div class="msg">⏳ در حال آماده‌سازی PDF...</div>
+  <div class="msg">⏳ در حال آماده‌سازی فایل...</div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-fill"></div></div>
   <div class="sub" id="prog-label">صفحه ۰ از ۰</div>
+</div>
+
+<div id="app-footer">
+  طراح: <span>سما بنا آذرپناه</span> — دبیر زیست‌شناسی و علوم ناحیه ۳ تبریز
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let pdfDoc = null;
+let imgFile = null;     // current loaded image element (for single image mode)
+let imgOrigWidth = 0;
+let imgOrigHeight = 0;
+let currentMode = 'pdf'; // 'pdf' | 'img'
 let zoom = 1.0;
 let selectedScore = null;
+let selectedSymbol = null; // 'tick' | 'cross' | null
 let mode = 'stamp';
 let stamps = [];
 let stampIdCounter = 0;
-// pageData[p] = { totalValue: string }
 let pageData = {};
+
+// ─── Upload mode tabs ───
+document.getElementById('tab-pdf').addEventListener('click', () => switchUploadMode('pdf'));
+document.getElementById('tab-img').addEventListener('click', () => switchUploadMode('img'));
+
+function switchUploadMode(m) {
+  currentMode = m;
+  document.getElementById('tab-pdf').classList.toggle('active', m === 'pdf');
+  document.getElementById('tab-img').classList.toggle('active', m === 'img');
+}
 
 // ─── Score buttons ───
 const scores = [];
@@ -542,11 +630,28 @@ function formatNum(n) {
 
 function selectScore(s) {
   selectedScore = s;
+  selectedSymbol = null;
   document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('sym-tick').classList.remove('selected');
+  document.getElementById('sym-cross').classList.remove('selected');
   const btn = palette.querySelector(`[data-score="${s}"]`);
   if (btn) btn.classList.add('selected');
   document.getElementById('selected-score-display').textContent = formatNum(s) + ' از ۴';
   if (mode === 'stamp') showCursorBadge(`نمره ${formatNum(s)} — کلیک برای درج`);
+}
+
+// ─── Symbol buttons (tick / cross) ───
+document.getElementById('sym-tick').addEventListener('click', () => selectSymbol('tick'));
+document.getElementById('sym-cross').addEventListener('click', () => selectSymbol('cross'));
+
+function selectSymbol(sym) {
+  selectedSymbol = sym;
+  selectedScore = null;
+  document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('sym-tick').classList.toggle('selected', sym === 'tick');
+  document.getElementById('sym-cross').classList.toggle('selected', sym === 'cross');
+  document.getElementById('selected-score-display').textContent = sym === 'tick' ? '✓ تیک' : '✗ ضربدر';
+  showCursorBadge(sym === 'tick' ? '✓ تیک — کلیک برای درج' : '✗ ضربدر — کلیک برای درج');
 }
 
 let badgeTimeout;
@@ -569,90 +674,130 @@ function setMode(m) {
 }
 
 // ─── File loading ───
-document.getElementById('open-btn').addEventListener('click', () => document.getElementById('file-input').click());
-document.getElementById('open-btn2').addEventListener('click', () => document.getElementById('file-input').click());
-document.getElementById('file-input').addEventListener('change', e => loadFile(e.target.files[0]));
+document.getElementById('open-btn').addEventListener('click', () => {
+  if (currentMode === 'pdf') document.getElementById('file-input').click();
+  else document.getElementById('img-input').click();
+});
+document.getElementById('open-btn2').addEventListener('click', () => { switchUploadMode('pdf'); document.getElementById('file-input').click(); });
+document.getElementById('open-img-btn2').addEventListener('click', () => { switchUploadMode('img'); document.getElementById('img-input').click(); });
+
+document.getElementById('file-input').addEventListener('change', e => loadPdfFile(e.target.files[0]));
+document.getElementById('img-input').addEventListener('change', e => loadImageFile(e.target.files[0]));
 
 const viewer = document.getElementById('viewer-wrap');
 viewer.addEventListener('dragover', e => { e.preventDefault(); });
-viewer.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type === 'application/pdf') loadFile(f); });
+viewer.addEventListener('drop', e => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (!f) return;
+  if (f.type === 'application/pdf') { switchUploadMode('pdf'); loadPdfFile(f); }
+  else if (f.type.startsWith('image/')) { switchUploadMode('img'); loadImageFile(f); }
+});
 
-function loadFile(file) {
+function loadPdfFile(file) {
   if (!file) return;
+  imgFile = null;
   const reader = new FileReader();
   reader.onload = async e => {
     const data = new Uint8Array(e.target.result);
     pdfDoc = await pdfjsLib.getDocument({ data }).promise;
-    stamps = [];
-    pageData = {};
+    stamps = []; pageData = {};
     renderAllPages();
     buildPageList();
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ─── Render pages ───
+function loadImageFile(file) {
+  if (!file) return;
+  pdfDoc = null;
+  stamps = []; pageData = {};
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    imgFile = img;
+    imgOrigWidth = img.naturalWidth;
+    imgOrigHeight = img.naturalHeight;
+    renderImage();
+    buildPageList();
+  };
+  img.src = url;
+}
+
+// ─── Render PDF pages ───
 async function renderAllPages() {
   const vw = document.getElementById('viewer-wrap');
   vw.innerHTML = '';
   const numPages = pdfDoc.numPages;
-
   for (let p = 1; p <= numPages; p++) {
     const page = await pdfDoc.getPage(p);
     const vp = page.getViewport({ scale: zoom * 1.5 });
-
     const container = document.createElement('div');
     container.className = 'page-container';
     container.dataset.page = p;
     container.style.width = vp.width + 'px';
     container.style.height = vp.height + 'px';
-
-    // Total score badge — editable text input
-    const badge = document.createElement('div');
-    badge.className = 'total-badge';
-    const savedVal = pageData[p]?.totalValue || '';
-    badge.innerHTML = `
-      <span class="badge-label">نمره کل ص${p}:</span>
-      <input class="edit-total" type="text" inputmode="decimal"
-             placeholder="وارد کنید" value="${savedVal}"
-             title="نمره کل این صفحه را تایپ کنید" data-page="${p}">
-      <span class="auto-hint" title="از مجموع نمرات این صفحه پر کن" data-page="${p}">← خودکار</span>
-    `;
-    container.appendChild(badge);
-
-    // Save value on change
-    badge.querySelector('.edit-total').addEventListener('input', e => {
-      if (!pageData[p]) pageData[p] = {};
-      pageData[p].totalValue = e.target.value;
-    });
-    // Auto-fill from stamps
-    badge.querySelector('.auto-hint').addEventListener('click', e => {
-      e.stopPropagation();
-      const sum = stamps.filter(s => s.page === p).reduce((a, s) => a + s.score, 0);
-      const rounded = Math.round(sum * 100) / 100;
-      badge.querySelector('.edit-total').value = formatNum(rounded);
-      if (!pageData[p]) pageData[p] = {};
-      pageData[p].totalValue = formatNum(rounded);
-    });
-
+    attachTotalBadge(container, p);
     const canvas = document.createElement('canvas');
-    canvas.width = vp.width;
-    canvas.height = vp.height;
+    canvas.width = vp.width; canvas.height = vp.height;
     container.appendChild(canvas);
-
     const ctx = canvas.getContext('2d');
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
     container.addEventListener('click', e => onPageClick(e, container, p));
     vw.appendChild(container);
-
     stamps.filter(s => s.page === p).forEach(s => renderStamp(s));
   }
 }
 
+// ─── Render single image ───
+function renderImage() {
+  const vw = document.getElementById('viewer-wrap');
+  vw.innerHTML = '';
+  const dispW = Math.round(imgOrigWidth * zoom);
+  const dispH = Math.round(imgOrigHeight * zoom);
+  const container = document.createElement('div');
+  container.className = 'img-container';
+  container.dataset.page = 1;
+  container.style.width = dispW + 'px';
+  container.style.height = dispH + 'px';
+  attachTotalBadge(container, 1);
+  const img = document.createElement('img');
+  img.src = imgFile.src;
+  img.style.width = dispW + 'px';
+  img.style.height = dispH + 'px';
+  container.appendChild(img);
+  container.addEventListener('click', e => onPageClick(e, container, 1));
+  vw.appendChild(container);
+  stamps.filter(s => s.page === 1).forEach(s => renderStamp(s));
+}
+
+function attachTotalBadge(container, p) {
+  const badge = document.createElement('div');
+  badge.className = 'total-badge';
+  const savedVal = pageData[p]?.totalValue || '';
+  badge.innerHTML = `
+    <span class="badge-label">نمره کل ص${p}:</span>
+    <input class="edit-total" type="text" inputmode="decimal" placeholder="وارد کنید" value="${savedVal}" data-page="${p}">
+    <span class="auto-hint" data-page="${p}">← خودکار</span>
+  `;
+  badge.querySelector('.edit-total').addEventListener('input', e => {
+    if (!pageData[p]) pageData[p] = {};
+    pageData[p].totalValue = e.target.value;
+  });
+  badge.querySelector('.auto-hint').addEventListener('click', e => {
+    e.stopPropagation();
+    const sum = stamps.filter(s => s.page === p && s.score !== undefined).reduce((a, s) => a + s.score, 0);
+    const rounded = Math.round(sum * 100) / 100;
+    badge.querySelector('.edit-total').value = formatNum(rounded);
+    if (!pageData[p]) pageData[p] = {};
+    pageData[p].totalValue = formatNum(rounded);
+  });
+  container.appendChild(badge);
+}
+
 function onPageClick(e, container, page) {
   if (mode !== 'stamp') return;
-  if (selectedScore === null) { showCursorBadge('ابتدا یک نمره انتخاب کنید ↓'); return; }
+  if (selectedScore === null && selectedSymbol === null) { showCursorBadge('ابتدا یک نمره یا علامت انتخاب کنید ↓'); return; }
   if (e.target.classList.contains('remove-stamp') ||
       e.target.classList.contains('auto-hint') ||
       e.target.closest('.total-badge')) return;
@@ -662,7 +807,12 @@ function onPageClick(e, container, page) {
   const y = e.clientY - rect.top;
   const label = document.getElementById('q-label').value.trim() || `س${page}`;
 
-  const stamp = { id: ++stampIdCounter, page, x, y, score: selectedScore, label };
+  let stamp;
+  if (selectedSymbol) {
+    stamp = { id: ++stampIdCounter, page, x, y, symbol: selectedSymbol, label };
+  } else {
+    stamp = { id: ++stampIdCounter, page, x, y, score: selectedScore, label };
+  }
   stamps.push(stamp);
   renderStamp(stamp);
   updateStampLog();
@@ -670,19 +820,25 @@ function onPageClick(e, container, page) {
 }
 
 function renderStamp(stamp) {
-  const container = document.querySelector(`.page-container[data-page="${stamp.page}"]`);
+  const container = document.querySelector(`[data-page="${stamp.page}"]`);
   if (!container) return;
-
   const el = document.createElement('div');
   el.className = 'score-stamp';
   el.dataset.id = stamp.id;
   el.style.left = stamp.x + 'px';
   el.style.top = stamp.y + 'px';
 
-  if (stamp.score === 0) el.style.background = 'var(--danger)';
-  else if (stamp.score === 4) { el.style.background = 'var(--success)'; el.style.color = '#0a1a12'; }
-
-  el.innerHTML = `<span style="opacity:0.75;font-size:11px">${stamp.label}</span> <span>${formatNum(stamp.score)}</span> <span class="remove-stamp" title="حذف">✕</span>`;
+  if (stamp.symbol === 'tick') {
+    el.classList.add('stamp-tick');
+    el.innerHTML = `<span style="font-size:30px;font-weight:900;line-height:1">✓</span> <span class="remove-stamp" title="حذف">✕</span>`;
+  } else if (stamp.symbol === 'cross') {
+    el.classList.add('stamp-cross');
+    el.innerHTML = `<span style="font-size:30px;font-weight:900;line-height:1">✗</span> <span class="remove-stamp" title="حذف">✕</span>`;
+  } else {
+    if (stamp.score === 0) el.style.background = 'var(--danger)';
+    else if (stamp.score === 4) { el.style.background = 'var(--success)'; el.style.color = '#0a1a12'; }
+    el.innerHTML = `<span style="opacity:0.75;font-size:11px">${stamp.label}</span> <span>${formatNum(stamp.score)}</span> <span class="remove-stamp" title="حذف">✕</span>`;
+  }
 
   el.querySelector('.remove-stamp').addEventListener('click', e => {
     e.stopPropagation();
@@ -691,7 +847,6 @@ function renderStamp(stamp) {
     updateStampLog();
     updateTotal();
   });
-
   makeDraggable(el, stamp);
   container.appendChild(el);
 }
@@ -700,19 +855,16 @@ function makeDraggable(el, stamp) {
   let dragging = false;
   el.addEventListener('mousedown', e => {
     if (e.target.classList.contains('remove-stamp')) return;
-    dragging = true;
-    el.style.cursor = 'grabbing';
-    e.stopPropagation();
+    dragging = true; el.style.cursor = 'grabbing'; e.stopPropagation();
   });
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
     const container = el.parentElement;
     const cr = container.getBoundingClientRect();
-    const nx = e.clientX - cr.left;
-    const ny = e.clientY - cr.top;
-    stamp.x = nx; stamp.y = ny;
-    el.style.left = nx + 'px';
-    el.style.top = ny + 'px';
+    stamp.x = e.clientX - cr.left;
+    stamp.y = e.clientY - cr.top;
+    el.style.left = stamp.x + 'px';
+    el.style.top = stamp.y + 'px';
   });
   document.addEventListener('mouseup', () => { dragging = false; el.style.cursor = 'move'; });
 }
@@ -723,7 +875,12 @@ function updateStampLog() {
   stamps.forEach(s => {
     const div = document.createElement('div');
     div.className = 'stamp-entry';
-    div.innerHTML = `<div class="score-dot">${formatNum(s.score)}</div><div class="label">سؤال ${s.label} — ص${s.page}</div><div class="del" title="حذف">✕</div>`;
+    let dotClass = 'score-dot';
+    let dotText = '';
+    if (s.symbol === 'tick') { dotClass += ' tick'; dotText = '✓'; }
+    else if (s.symbol === 'cross') { dotClass += ' cross'; dotText = '✗'; }
+    else dotText = formatNum(s.score);
+    div.innerHTML = `<div class="${dotClass}">${dotText}</div><div class="label">سؤال ${s.label} — ص${s.page}</div><div class="del" title="حذف">✕</div>`;
     div.querySelector('.del').addEventListener('click', () => {
       const el = document.querySelector(`.score-stamp[data-id="${s.id}"]`);
       if (el) el.remove();
@@ -736,21 +893,22 @@ function updateStampLog() {
 }
 
 function updateTotal() {
-  const sum = stamps.reduce((a, s) => a + s.score, 0);
+  const sum = stamps.filter(s => s.score !== undefined).reduce((a, s) => a + s.score, 0);
   document.getElementById('total-sum').textContent = formatNum(Math.round(sum * 100) / 100);
 }
 
 function buildPageList() {
   const list = document.getElementById('page-list');
   list.innerHTML = '';
-  for (let p = 1; p <= pdfDoc.numPages; p++) {
+  const numPages = pdfDoc ? pdfDoc.numPages : (imgFile ? 1 : 0);
+  for (let p = 1; p <= numPages; p++) {
     const div = document.createElement('div');
     div.className = 'page-thumb' + (p === 1 ? ' active' : '');
     div.innerHTML = `<div class="num">${p}</div><span>صفحه ${p}</span>`;
     div.addEventListener('click', () => {
       document.querySelectorAll('.page-thumb').forEach(t => t.classList.remove('active'));
       div.classList.add('active');
-      const pc = document.querySelector(`.page-container[data-page="${p}"]`);
+      const pc = document.querySelector(`[data-page="${p}"]`);
       if (pc) pc.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     list.appendChild(div);
@@ -763,6 +921,7 @@ document.getElementById('zoom-out').addEventListener('click', () => { zoom = Mat
 function updateZoom() {
   document.getElementById('zoom-label').textContent = Math.round(zoom * 100) + '%';
   if (pdfDoc) renderAllPages();
+  else if (imgFile) renderImage();
 }
 
 // ─── JSON Export ───
@@ -773,25 +932,70 @@ document.getElementById('export-json-btn').addEventListener('click', () => {
   a.download = 'نمرات.json'; a.click();
 });
 
-// ─── PDF Export ───
+// ─── Export (PDF or Image) ───
 document.getElementById('export-pdf-btn').addEventListener('click', async () => {
-  if (!pdfDoc) { alert('ابتدا یک فایل PDF بارگذاری کنید.'); return; }
+  if (imgFile) { exportImage(); return; }
+  if (!pdfDoc) { alert('ابتدا یک فایل بارگذاری کنید.'); return; }
+  await exportPdf();
+});
 
+// ─── Export image with annotations ───
+function exportImage() {
+  const overlay = document.getElementById('export-overlay');
+  const progFill = document.getElementById('prog-fill');
+  const progLabel = document.getElementById('prog-label');
+  overlay.classList.add('visible');
+  progLabel.textContent = 'در حال رندر تصویر...';
+  progFill.style.width = '60%';
+
+  const EXPORT_SCALE = 1 / zoom; // render at original resolution
+  const canvas = document.createElement('canvas');
+  canvas.width = imgOrigWidth;
+  canvas.height = imgOrigHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imgFile, 0, 0, imgOrigWidth, imgOrigHeight);
+
+  // draw stamps
+  const scaleRatio = 1 / zoom;
+  stamps.filter(s => s.page === 1).forEach(stamp => {
+    const ex = stamp.x * scaleRatio;
+    const ey = stamp.y * scaleRatio;
+    if (stamp.symbol) {
+      drawSymbolOnCanvas(ctx, stamp, ex, ey);
+    } else {
+      drawStampOnCanvas(ctx, stamp, ex, ey);
+    }
+  });
+
+  // draw total badge
+  const totalVal = pageData[1]?.totalValue || '';
+  if (totalVal !== '') drawTotalBadgeOnCanvas(ctx, 1, totalVal);
+
+  // draw final score top-left
+  const finalScore = document.getElementById('final-score-input').value.trim();
+  const finalMax = document.getElementById('final-score-max').value.trim() || '۲۰';
+  if (finalScore !== '') drawFinalScoreOnCanvas(ctx, finalScore, finalMax);
+
+  progFill.style.width = '100%';
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ورقه-تصحیح‌شده.png';
+    a.click();
+    setTimeout(() => { overlay.classList.remove('visible'); progFill.style.width = '0%'; }, 600);
+  }, 'image/png');
+}
+
+// ─── Export PDF ───
+async function exportPdf() {
   const overlay = document.getElementById('export-overlay');
   const progFill = document.getElementById('prog-fill');
   const progLabel = document.getElementById('prog-label');
   overlay.classList.add('visible');
 
   const numPages = pdfDoc.numPages;
-  // Use high-res scale for output
   const EXPORT_SCALE = 2.0;
 
-  // We'll build a multi-page PDF using canvas → image → PDF (via hidden iframe print trick is unreliable)
-  // Instead: draw each page to canvas with annotations, collect as images, then use jsPDF-like approach
-  // Since we don't have jsPDF loaded, we use a single large canvas approach and generate PDF via canvas.toBlob
-  // Best approach without external PDF lib: render all pages to canvas, combine as multi-page PDF using canvas data
-
-  // We'll dynamically load jsPDF from CDN
   if (!window.jspdf) {
     progLabel.textContent = 'در حال بارگذاری کتابخانه PDF...';
     await new Promise((res, rej) => {
@@ -803,7 +1007,6 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
   }
 
   const { jsPDF } = window.jspdf;
-
   let pdf = null;
 
   for (let p = 1; p <= numPages; p++) {
@@ -812,97 +1015,86 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
 
     const page = await pdfDoc.getPage(p);
     const vp = page.getViewport({ scale: EXPORT_SCALE });
-
-    // Create offscreen canvas
     const canvas = document.createElement('canvas');
-    canvas.width = vp.width;
-    canvas.height = vp.height;
+    canvas.width = vp.width; canvas.height = vp.height;
     const ctx = canvas.getContext('2d');
-
-    // Render PDF page
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
-    // Draw stamps for this page
-    const pageStamps = stamps.filter(s => s.page === p);
-    // We need to map from viewer coords to export coords
-    // Viewer scale = zoom * 1.5, export scale = EXPORT_SCALE
     const viewerScale = zoom * 1.5;
-    const exportScale = EXPORT_SCALE;
-    const scaleRatio = exportScale / viewerScale;
+    const scaleRatio = EXPORT_SCALE / viewerScale;
 
-    for (const stamp of pageStamps) {
+    stamps.filter(s => s.page === p).forEach(stamp => {
       const ex = stamp.x * scaleRatio;
       const ey = stamp.y * scaleRatio;
-      drawStampOnCanvas(ctx, stamp, ex, ey);
-    }
+      if (stamp.symbol) drawSymbolOnCanvas(ctx, stamp, ex, ey);
+      else drawStampOnCanvas(ctx, stamp, ex, ey);
+    });
 
-    // Draw total badge top-left
     const totalVal = pageData[p]?.totalValue || '';
-    if (totalVal !== '') {
-      drawTotalBadgeOnCanvas(ctx, p, totalVal);
+    if (totalVal !== '') drawTotalBadgeOnCanvas(ctx, p, totalVal);
+
+    // draw final score on first page top-left
+    if (p === 1) {
+      const finalScore = document.getElementById('final-score-input').value.trim();
+      const finalMax = document.getElementById('final-score-max').value.trim() || '۲۰';
+      if (finalScore !== '') drawFinalScoreOnCanvas(ctx, finalScore, finalMax);
     }
 
-    // Add to PDF
     const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    const pdfW = vp.width * 0.75; // 72dpi -> pt
+    const pdfW = vp.width * 0.75;
     const pdfH = vp.height * 0.75;
 
     if (p === 1) {
-      pdf = new jsPDF({
-        orientation: vp.width > vp.height ? 'landscape' : 'portrait',
-        unit: 'pt',
-        format: [pdfW, pdfH]
-      });
+      pdf = new jsPDF({ orientation: vp.width > vp.height ? 'landscape' : 'portrait', unit: 'pt', format: [pdfW, pdfH] });
     } else {
       pdf.addPage([pdfW, pdfH], vp.width > vp.height ? 'landscape' : 'portrait');
     }
-
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
     progFill.style.width = (p / numPages * 100) + '%';
-
-    // Yield to browser
     await new Promise(r => setTimeout(r, 10));
   }
 
   progLabel.textContent = 'در حال ذخیره...';
   pdf.save('ورقه-تصحیح‌شده.pdf');
+  setTimeout(() => { overlay.classList.remove('visible'); progFill.style.width = '0%'; }, 600);
+}
 
-  setTimeout(() => {
-    overlay.classList.remove('visible');
-    progFill.style.width = '0%';
-  }, 600);
-});
+function drawSymbolOnCanvas(ctx, stamp, ex, ey) {
+  const sym = stamp.symbol === 'tick' ? '✓' : '✗';
+  const color = stamp.symbol === 'tick' ? '#4ff7a0' : '#f74f4f';
+  const shadowColor = stamp.symbol === 'tick' ? 'rgba(79,247,160,0.5)' : 'rgba(247,79,79,0.5)';
+  ctx.save();
+  ctx.font = 'bold 56px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // shadow for legibility
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+  ctx.fillStyle = color;
+  ctx.fillText(sym, ex, ey);
+  ctx.restore();
+}
 
 function drawStampOnCanvas(ctx, stamp, ex, ey) {
   const text = `${stamp.label}: ${formatNum(stamp.score)}`;
   const pad = 10;
   ctx.font = 'bold 24px sans-serif';
   const tw = ctx.measureText(text).width;
-  const bw = tw + pad * 2;
-  const bh = 36;
-  const bx = ex - bw / 2;
-  const by = ey - bh / 2;
+  const bw = tw + pad * 2; const bh = 36;
+  const bx = ex - bw / 2; const by = ey - bh / 2;
 
-  // Background
-  let bg = '#4f8ef7';
-  let fg = '#ffffff';
+  let bg = '#4f8ef7', fg = '#ffffff';
   if (stamp.score === 0) bg = '#f74f4f';
   else if (stamp.score === 4) { bg = '#4ff7a0'; fg = '#0a1a12'; }
 
   ctx.save();
-  // Rounded rect
   roundRect(ctx, bx, by, bw, bh, 8);
-  ctx.fillStyle = bg;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Text
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2; ctx.stroke();
   ctx.fillStyle = fg;
   ctx.font = 'bold 22px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(text, ex, ey);
   ctx.restore();
 }
@@ -911,20 +1103,37 @@ function drawTotalBadgeOnCanvas(ctx, page, val) {
   const label = `نمره کل ص${page}: ${val}`;
   ctx.font = 'bold 26px sans-serif';
   const tw = ctx.measureText(label).width;
-  const bw = tw + 28;
-  const bh = 46;
-  const bx = 16;
-  const by = 16;
-
+  const bw = tw + 28; const bh = 46;
   ctx.save();
-  roundRect(ctx, bx, by, bw, bh, 12);
-  ctx.fillStyle = '#f7c14f';
-  ctx.fill();
+  roundRect(ctx, 16, 16, bw, bh, 12);
+  ctx.fillStyle = '#f7c14f'; ctx.fill();
   ctx.fillStyle = '#1a1500';
   ctx.font = 'bold 24px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(label, bx + 14, by + bh / 2);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, 30, 16 + bh / 2);
+  ctx.restore();
+}
+
+function drawFinalScoreOnCanvas(ctx, score, maxScore) {
+  const label = `نمره نهایی: ${score} / ${maxScore}`;
+  ctx.font = 'bold 32px sans-serif';
+  const tw = ctx.measureText(label).width;
+  const bw = tw + 36; const bh = 58;
+  const bx = 16;
+  // place below total badge area (approx 80px from top)
+  const by = 80;
+  ctx.save();
+  // shadow
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowBlur = 12;
+  roundRect(ctx, bx, by, bw, bh, 14);
+  ctx.fillStyle = '#1e3a5f'; ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 30px sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, bx + 18, by + bh / 2);
   ctx.restore();
 }
 
@@ -946,5 +1155,3 @@ viewer.style.cursor = 'crosshair';
 </script>
 </body>
 </html>
-
-طراح: خانم‌آذرپناه دبیر علوم ناحیه3 تبریز
