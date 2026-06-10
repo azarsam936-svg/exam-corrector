@@ -83,6 +83,183 @@
 
   #file-input, #img-input { display: none; }
 
+  /* Fullscreen button */
+  .fullscreen-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fullscreen-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .fullscreen-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  /* Floating Advanced Version Button */
+  #advanced-fab {
+    position: fixed;
+    bottom: 150px;
+    left: 30px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(79, 247, 160, 0.95) 0%, rgba(79, 247, 160, 0.7) 40%, rgba(45, 212, 127, 0.8) 100%);
+    border: 2px solid rgba(79, 247, 160, 0.3);
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(79, 247, 160, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 99;
+    font-weight: bold;
+  }
+  #advanced-fab:hover {
+    transform: scale(1.12);
+    box-shadow: 0 12px 40px rgba(79, 247, 160, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    bottom: 140px;
+  }
+  #advanced-fab:active {
+    transform: scale(0.92);
+  }
+
+  /* Advanced Modal */
+  #advanced-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+  }
+  #advanced-modal.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-content h2 {
+    font-size: 20px;
+    color: var(--success);
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+
+  .modal-content p {
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .modal-content .loading-text {
+    color: var(--success);
+    font-weight: 600;
+    margin: 20px 0;
+    font-size: 16px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .modal-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .modal-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px;
+  }
+  .modal-link:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+  }
+
+  .modal-link.secondary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .modal-link.secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .modal-close {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+  .modal-close:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .credit-text {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
   /* mode tab strip */
   .upload-tabs {
     display: flex;
@@ -483,11 +660,12 @@
   </div>
 
   <button class="btn secondary" id="open-btn">📂 بارگذاری</button>
+  <button class="fullscreen-btn" id="fullscreen-btn" title="تمام صفحه">⛶ تمام صفحه</button>
   <button class="btn secondary" id="export-json-btn">💾 JSON</button>
   <button class="btn success" id="export-pdf-btn">⬇ دانلود نهایی</button>
 
   <input type="file" id="file-input" accept=".pdf">
-  <input type="file" id="img-input" accept="image/*">
+  <input type="file" id="img-input" accept="image/*" multiple>
 </div>
 
 <!-- FINAL SCORE BAR -->
@@ -499,7 +677,13 @@
     style="background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:5px 10px;font-family:'Vazirmatn',sans-serif;font-size:14px;font-weight:600;color:var(--text);width:64px;text-align:center;user-select:text;">
   <span class="final-score-hint">← این نمره روی خروجی نهایی چاپ می‌شود</span>
   <div class="divider"></div>
+  <span class="final-score-hint"> انتقال به نسخه پیشرفته←</span>
+<a href="https://chat.deepseek.com/a/chat/s/df2849d8-96fa-4e61-8c91-77dfe757e4d6" target="_blank" class="btn" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a1a2e; font-weight: bold; transition: all 0.2s; border: none;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(255,215,0,0.6)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+
+  
+</a>
 </div>
+
 
 <!-- MAIN -->
 <div id="main">
@@ -1153,6 +1337,94 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 viewer.style.cursor = 'crosshair';
+
+// ─── Fullscreen Toggle ───
+let isFullscreen = false;
+document.getElementById('fullscreen-btn').addEventListener('click', async () => {
+  try {
+    if (!isFullscreen) {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        await elem.webkitRequestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        await elem.mozRequestFullScreen();
+      } else if (elem.msRequestFullscreen) {
+        await elem.msRequestFullscreen();
+      }
+      isFullscreen = true;
+      document.getElementById('fullscreen-btn').textContent = '⛶ خروج';
+    } else {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        await document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        await document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        await document.msExitFullscreen();
+      }
+      isFullscreen = false;
+      document.getElementById('fullscreen-btn').textContent = '⛶ تمام صفحه';
+    }
+  } catch (err) {
+    console.error('Fullscreen error:', err);
+  }
+});
+
+// Listen for fullscreen changes (e.g., when user presses Esc)
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && isFullscreen) {
+    isFullscreen = false;
+    document.getElementById('fullscreen-btn').textContent = '⛶ تمام صفحه';
+  }
+});
+document.addEventListener('webkitfullscreenchange', () => {
+  if (!document.webkitFullscreenElement && isFullscreen) {
+    isFullscreen = false;
+    document.getElementById('fullscreen-btn').textContent = '⛶ تمام صفحه';
+  }
+});
+
+// ─── Advanced Version Modal ───
+(function setupAdvancedModal() {
+  const fab = document.getElementById('advanced-fab');
+  const modal = document.getElementById('advanced-modal');
+  const closeBtn = document.getElementById('modal-close-btn');
+
+  if (!fab || !modal) return;
+
+  fab.addEventListener('click', () => {
+    modal.classList.add('show');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('show');
+  });
+
+  // Handle advanced version link
+  const advLink = modal.querySelector('#advanced-version-link');
+  if (advLink) {
+    advLink.addEventListener('click', (e) => {
+      // You can replace '#' with actual advanced version URL
+      if (advLink.href && advLink.href !== '#' && !advLink.href.endsWith('#')) {
+        // Will navigate
+      } else {
+        e.preventDefault();
+        alert('لینک نسخهٔ پیشرفته هنوز تنظیم نشده است.');
+      }
+    });
+  }
+})();
+
 </script>
+
+    
+
 </body>
 </html>
